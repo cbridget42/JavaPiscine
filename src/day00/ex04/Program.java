@@ -17,10 +17,12 @@ public class Program {
     }
 
     private static void printResult(int[] numOfOccur, int[] maxes) {
-        printNumber(numOfOccur[maxes[0]]);
-        System.out.println();
         int[] columns = calculateColumns(numOfOccur, maxes);
         int row = SHOW;
+        if (columns[0] != 0) {
+            printNumber(numOfOccur[maxes[0]]);
+            System.out.println();
+        }
         for (int i = 0; i < SHOW; i++) {
             for (int j = 0; j < columns.length; j++) {
                 if (row - 1 == columns[j]) {
@@ -36,6 +38,7 @@ public class Program {
         for (int i = 0; i < SHOW; i++) {
             System.out.print("  " + (char)maxes[i]);
         }
+        System.out.println();
     }
 
     private static void printNumber(int num) {
@@ -49,7 +52,9 @@ public class Program {
 
     private static int[] calculateColumns(int[] numOfOccur, int[] maxes) {
         int[] res = new int[SHOW];
-        res[0] = SHOW;
+        if (numOfOccur[maxes[0]] != 0) {
+            res[0] = SHOW;
+        }
         for (int i = 1; i < SHOW; i++) {
             res[i] = (int)((double)numOfOccur[maxes[i]] / numOfOccur[maxes[0]] * 100) / 10;
         }
@@ -66,7 +71,7 @@ public class Program {
 
     private static int getMax(int[] numOfOccur, int[] arr, int cur) {
         int max = 0;
-        int res = -1;
+        int res = 0;
         for (int i = 0; i < numOfOccur.length; i++) {
             if (numOfOccur[i] > max && isIndexGood(arr, i, cur)) {
                 max = numOfOccur[i];
