@@ -27,6 +27,7 @@ public class Program {
                 System.exit(-1);
             }
         }
+        sc.close();
         printResult(statistics, curWeek);
     }
 
