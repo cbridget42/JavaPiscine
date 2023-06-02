@@ -1,0 +1,44 @@
+package day01.ex00;
+
+import java.util.UUID;
+
+public class Transaction {
+    private final UUID identifier;
+    private User recipient;
+    private User sender;
+    private Category transferCategory;
+    private int transferAmount;
+
+    enum Category {
+        DEBIT,
+        CREDIT
+    }
+
+    public Transaction(User recipient, User sender, int transferAmount) {
+        this.identifier = UUID.randomUUID();
+        this.recipient = recipient;
+        this.sender = sender;
+        this.transferAmount = (recipient.getBalance() + transferAmount >= 0
+                && sender.getBalance() - transferAmount >= 0) ? transferAmount : 0;
+        this.transferCategory = (this.transferAmount >= 0) ? Category.DEBIT : Category.CREDIT;
+        recipient.setBalance(recipient.getBalance() + this.transferAmount);
+        sender.setBalance(sender.getBalance() - this.transferAmount);
+    }
+
+    @Override
+    public String toString() {
+        String transfer = (transferCategory == Category.DEBIT) ? "INCOME" : "OUTCOME";
+        return String.format("%s -> %s, %d, %s, %s%n",
+                sender.getName(), recipient.getName(), transferAmount, transfer, identifier.toString());
+    }
+
+    public UUID getIdentifier() {return this.identifier;}
+    public User getRecipient() {return this.recipient;}
+    public void setRecipient(User recipient) {this.recipient = recipient;}
+    public User getSender() {return this.sender;}
+    public void setSender(User sender) {this.sender = sender;}
+    public Category getTransferCategory() {return this.transferCategory;}
+    public void setTransferCategory(Category transferCategory) {this.transferCategory = transferCategory;}
+    public int getTransferAmount() {return this.transferAmount;}
+    public void setTransferAmount(int transferAmount) {this.transferAmount = transferAmount;}
+}
