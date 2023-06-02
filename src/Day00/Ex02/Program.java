@@ -19,7 +19,8 @@ public class Program {
                 }
             }
         }
-        System.out.println("Count of coffee - request - " +  count);
+        sc.close();
+        System.out.println("Count of coffee-request - " +  count);
     }
 
     private static boolean isPrime(int x) {
