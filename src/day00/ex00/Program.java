@@ -1,4 +1,4 @@
-package Day00.Ex00;
+package day00.ex00;
 
 public class Program {
     private static final int TENTHLY = 10;

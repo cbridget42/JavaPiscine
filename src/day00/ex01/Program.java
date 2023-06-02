@@ -1,4 +1,4 @@
-package Day00.Ex01;
+package day00.ex01;
 
 import java.util.Scanner;
 
