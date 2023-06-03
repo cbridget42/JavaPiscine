@@ -48,4 +48,6 @@ public class UsersArrayList implements UsersList {
     public int getNumberOfUsers() {
         return size;
     }
+
+    public Integer getCapacity() {return this.capacity;}
 }

@@ -13,6 +13,9 @@ public class Program {
             System.out.println(test.getUserByIndex(i).toString());
         }
 
+        UsersArrayList tmp = (UsersArrayList)test;
+        System.out.println("capacity = " + tmp.getCapacity());
+
         try {
             test.getUserById(-10);
         } catch (Exception e) {
