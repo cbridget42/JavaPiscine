@@ -49,6 +49,6 @@ public class Transaction {
     public void setSender(User sender) {this.sender = sender;}
     public Category getTransferCategory() {return this.transferCategory;}
     public void setTransferCategory(Category transferCategory) {this.transferCategory = transferCategory;}
-    public int getTransferAmount() {return this.transferAmount;}
-    public void setTransferAmount(int transferAmount) {this.transferAmount = transferAmount;}
+    public Integer getTransferAmount() {return this.transferAmount;}
+    public void setTransferAmount(Integer transferAmount) {this.transferAmount = transferAmount;}
 }

@@ -26,7 +26,7 @@ public class User {
         }
     }
 
-    public int getBalance() {
+    public Integer getBalance() {
         return this.balance;
     }
 
@@ -38,7 +38,7 @@ public class User {
         return this.name;
     }
 
-    public int getIdentifier() {
+    public Integer getIdentifier() {
         return this.identifier;
     }
 }
