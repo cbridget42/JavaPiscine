@@ -8,13 +8,13 @@ public class Program {
         User john = new User("John", 1000);
         System.out.println(john);
 
-        Transaction trans = new Transaction(mike, john,500);
+        Transaction trans = new Transaction(mike, john,500, Transaction.Category.DEBIT);
         System.out.println(trans);
 
         User elizabeth = new User("Elizabeth", 800);
         System.out.println(elizabeth);
 
-        Transaction trans2 = new Transaction(john, elizabeth, -300);
+        Transaction trans2 = new Transaction(john, elizabeth, -300, Transaction.Category.CREDIT);
         System.out.println(trans2 + "\n" + mike + "\n" + john + "\n" + elizabeth);
     }
 }

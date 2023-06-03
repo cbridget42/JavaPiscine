@@ -7,20 +7,30 @@ public class Transaction {
     private User recipient;
     private User sender;
     private Category transferCategory;
-    private int transferAmount;
+    private Integer transferAmount;
 
     enum Category {
         DEBIT,
         CREDIT
     }
 
-    public Transaction(User recipient, User sender, int transferAmount) {
+    public Transaction(User recipient, User sender, Integer transferAmount, Category transferCategory) {
         this.identifier = UUID.randomUUID();
         this.recipient = recipient;
         this.sender = sender;
-        this.transferAmount = (recipient.getBalance() + transferAmount >= 0
-                && sender.getBalance() - transferAmount >= 0) ? transferAmount : 0;
-        this.transferCategory = (this.transferAmount >= 0) ? Category.DEBIT : Category.CREDIT;
+        this.transferCategory = transferCategory;
+        if ((transferCategory == Category.DEBIT && sender.getBalance() - transferAmount >= 0 &&
+                transferAmount > 0) ||
+                (transferCategory == Category.CREDIT && recipient.getBalance() + transferAmount >= 0 &&
+                transferAmount < 0)) {
+            this.transferAmount = transferAmount;
+        } else {
+            this.transferAmount = 0;
+        }
+        performTransaction();
+    }
+
+    private void performTransaction() {
         recipient.setBalance(recipient.getBalance() + this.transferAmount);
         sender.setBalance(sender.getBalance() - this.transferAmount);
     }

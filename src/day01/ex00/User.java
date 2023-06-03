@@ -1,12 +1,12 @@
 package day01.ex00;
 
 public class User {
-    private static int idCounter = 0;
-    private final int identifier;
+    private static Integer idCounter = 0;
+    private final Integer identifier;
     private String name;
-    private int balance;
+    private Integer balance;
 
-    public User(String name, int balance) {
+    public User(String name, Integer balance) {
         this.identifier = idCounter++;
         setName(name);
         setBalance(balance);
@@ -18,7 +18,7 @@ public class User {
                 name, identifier, balance);
     }
 
-    public void setBalance(int amount) {
+    public void setBalance(Integer amount) {
         if (amount >= 0) {
             this.balance = amount;
         } else {
@@ -31,7 +31,7 @@ public class User {
     }
 
     public void setName(String name) {
-        this.name = (name.length() > 0) ? name : "default_" + identifier;
+        this.name = name;
     }
 
     public String getName() {
