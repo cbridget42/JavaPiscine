@@ -19,6 +19,7 @@ public class TransactionsLinkedList implements TransactionsList {
             head.next = tmp;
         } else {
             Node tmp = new Node(transaction, head.prev, head);
+            head.prev.next = tmp;
             head.prev = tmp;
         }
         ++size;
@@ -31,8 +32,10 @@ public class TransactionsLinkedList implements TransactionsList {
             if (tmp.item.getIdentifier().equals(id)) {
                 tmp.next.prev = tmp.prev;
                 tmp.prev.next = tmp.next;
+                --size;
                 return;
             }
+            tmp = tmp.next;
         }
         throw new TransactionNotFoundException("Invalid transaction id!");
     }
@@ -62,35 +65,3 @@ public class TransactionsLinkedList implements TransactionsList {
         }
     }
 }
-
-/*class Node {
-    private final Transaction item;
-    private Node prev;
-    private Node next;
-
-    public Node (Transaction item, Node prev, Node next) {
-        this.item = item;
-        this.prev = prev;
-        this.next = next;
-    }
-
-    public Transaction getItem() {
-        return item;
-    }
-
-    public Node getPrev() {
-        return prev;
-    }
-
-    public void setPrev(Node prev) {
-        this.prev = prev;
-    }
-
-    public Node getNext() {
-        return next;
-    }
-
-    public void setNext(Node next) {
-        this.next = next;
-    }
-}*/

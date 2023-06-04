@@ -8,8 +8,9 @@ public class Program {
         User usr2 = new User("User2", 21000);
         TransactionsList test = new TransactionsLinkedList();
         Transaction trans = new Transaction(usr1, usr2, 200, Transaction.Category.DEBIT);
-        test.addTransaction(trans);
+
         test.addTransaction(new Transaction(usr1, usr2, 500, Transaction.Category.DEBIT));
+        test.addTransaction(trans);
         test.addTransaction(new Transaction(usr1, usr2, 5000, Transaction.Category.DEBIT));
         test.addTransaction(new Transaction(usr1, usr2, -800, Transaction.Category.CREDIT));
 
