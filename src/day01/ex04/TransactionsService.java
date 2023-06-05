@@ -46,14 +46,14 @@ public class TransactionsService {
         }
         int i = 0;
         while (allTransactions.getSize() != i) {
-            if (!isTransactionHaveDuplicate(i, allTransactions)) {
+            if (!deleteDuplicate(i, allTransactions)) {
                 i++;
             }
         }
         return allTransactions.toArray();
     }
 
-    private boolean isTransactionHaveDuplicate(int index, TransactionsLinkedList arrOfTrans) {
+    private boolean deleteDuplicate(int index, TransactionsLinkedList arrOfTrans) {
         Transaction[] arrTmp = arrOfTrans.toArray();
         UUID check = arrTmp[index].getIdentifier();
         for (int i = 0; i < arrTmp.length; i++) {
