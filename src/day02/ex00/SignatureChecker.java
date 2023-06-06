@@ -6,13 +6,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SignatureChecker {
-    private static final String SIGNATURE_PATH = "src/day02/ex00/signatures.txt";///home/alex/javaPrjc/JavaPiscine
+    private static final String SIGNATURE_PATH = "src/day02/ex00/signatures.txt";
     private static final String RESULT_PATH = "src/day02/ex00/result.txt";
     private static final int BUFF_SIZE = 2048;
     private static final int MAX_SIGNATURE_LENGTH = 20;
     private static final String UNDEF = "UNDEFINED";
     private static final String PROC = "PROCESSED";
-    private Map<String, String> signatures;
+    private final Map<String, String> signatures;
+    private static boolean append = false;
 
     public SignatureChecker() {
         this.signatures = new HashMap<>();
@@ -41,12 +42,13 @@ public class SignatureChecker {
     public void checkSignature(String inputFilePath) {
         try (FileInputStream inputFile = new FileInputStream(inputFilePath)) {
             byte[] bytes = new byte[MAX_SIGNATURE_LENGTH];
-            if (inputFile.available() >= MAX_SIGNATURE_LENGTH) {
-                inputFile.read(bytes, 0, MAX_SIGNATURE_LENGTH);
-            } else {
-                inputFile.read(bytes, 0, inputFile.available());
+            int size = (inputFile.available() >= MAX_SIGNATURE_LENGTH) ?
+                    MAX_SIGNATURE_LENGTH : inputFile.available();
+            if (inputFile.read(bytes, 0, size) != size) {
+                System.err.println("can't read file");
+                return;
             }
-            String sign = byteArrayToHex(bytes);
+            String sign = getFileSignature(bytes);
             if (sign == null) {
                 System.out.println(UNDEF);
             } else {
@@ -57,20 +59,23 @@ public class SignatureChecker {
         }
     }
 
-    private void writeResult(String sign) {
-        try (FileOutputStream resultFile = new FileOutputStream(RESULT_PATH)) {
+    private static void writeResult(String sign) {
+        try (FileOutputStream resultFile = new FileOutputStream(RESULT_PATH, append)) {
             resultFile.write(sign.getBytes());
             System.out.println(PROC);
         } catch (Exception e) {
             System.err.println(e);
         }
+        if (!append) {
+            append = true;
+        }
     }
 
-    private String byteArrayToHex(byte[] a) {
+    private String getFileSignature(byte[] a) {
         String hexSign = "";
         String res = null;
         for(byte b : a) {
-            hexSign += String.format("%02x", b);
+            hexSign += String.format("%02X", b);
             res = signatures.get(hexSign);
             if (res != null) {
                 return res;
