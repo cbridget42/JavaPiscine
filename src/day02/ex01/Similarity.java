@@ -16,8 +16,8 @@ public class Similarity {
         this.firstText = fileToArray(file1);
         this.secondText = fileToArray(file2);
         this.dictionary = new HashSet<>();
-        createDictionary(firstText);
-        createDictionary(secondText);
+        dictionary.addAll(firstText);
+        dictionary.addAll(secondText);
     }
 
     public void createDictionaryFile() {
@@ -43,13 +43,19 @@ public class Similarity {
         }
         double numerator = getNumerator(firstVector, secondVector);
         double denominator = getDenominator(firstVector, secondVector);
-        return (double)((int)(numerator / denominator * 100)) / 100;
+        return cutPrecision(numerator / denominator);
     }
 
     private double getDenominator(int[] firstVector, int[] secondVector) {
         double x = getSqrt(getNumerator(firstVector, firstVector));
         double y = getSqrt(getNumerator(secondVector, secondVector));
+        x = cutPrecision(x);
+        y = cutPrecision(y);
         return x * y;
+    }
+
+    private double cutPrecision(double num) {
+        return (double)((int)(num * 100)) / 100;
     }
 
     private double getNumerator(int[] firstVector, int[] secondVector) {
@@ -67,9 +73,7 @@ public class Similarity {
             while ((strTmp = fileReader.readLine()) != null) {
                 String[] arrTmp = strTmp.replaceAll("\\p{Punct}", "").
                         split(" ");
-                for (int i = 0; i < arrTmp.length; i++) {
-                    res.add(arrTmp[i]);
-                }
+                res.addAll(Arrays.asList(arrTmp));
             }
         } catch (Exception e) {
             System.err.println(e);
@@ -78,17 +82,11 @@ public class Similarity {
         return res;
     }
 
-    private void createDictionary(List<String> arr) {
-        for (String str : arr) {
-            dictionary.add(str);
-        }
-    }
-
     public static double getSqrt(Double x) {
         double y = x;
         double z = (y + (x / y)) / 2;
 
-        while (getAbs(y - z) >= 0.1) {
+        while (getAbs(y - z) >= 0.000001) {
             y = z;
             z = (y + (x / y)) / 2;
         }
