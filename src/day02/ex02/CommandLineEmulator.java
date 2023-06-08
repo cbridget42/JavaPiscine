@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 public class CommandLineEmulator {
     private static final String FLAG = "--current-folder=";
     private Path workingDir;
-    private Scanner sc;
+    private final Scanner sc;
 
     public CommandLineEmulator(String path) {
         if (!path.startsWith(FLAG)) {
@@ -44,7 +44,7 @@ public class CommandLineEmulator {
 
     private void executeMv(String oldName, String newName) {
         Path oldPath = Paths.get(workingDir.toString(), oldName);
-        if (!Files.exists(oldPath)) {
+        if (!Files.exists(oldPath) && Files.isRegularFile(oldPath)) {
             System.out.println("Wrong mv argument");
             return;
         }
