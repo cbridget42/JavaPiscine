@@ -12,7 +12,7 @@ public class CommandLineEmulator {
     private Scanner sc;
 
     public CommandLineEmulator(String path) {
-        if (!path.contains(FLAG)) {
+        if (!path.startsWith(FLAG)) {
             printError("Invalid argument");
         }
         this.workingDir = Paths.get(path.substring(FLAG.length()));
@@ -31,9 +31,42 @@ public class CommandLineEmulator {
                 executeLs();
             } else if (com.length == 1 && com[0].equals("exit")) {
                 run = false;
+            } else if (com.length == 2 && com[0].equals("cd")) {
+                executeCd(com[1]);
+            } else if (com.length == 3 && com[0].equals("mv")) {
+                executeMv(com[1], com[2]);
             } else {
                 System.out.println("Wrong command! try again");
             }
+        }
+        sc.close();
+    }
+
+    private void executeMv(String oldName, String newName) {
+        Path oldPath = Paths.get(workingDir.toString(), oldName);
+        if (!Files.exists(oldPath)) {
+            System.out.println("Wrong mv argument");
+            return;
+        }
+        Path newPath = Paths.get(workingDir.toString(), newName);
+        if (Files.isDirectory(newPath)) {
+            newPath = Paths.get(newPath.toString(), oldName);
+        }
+        try {
+            Files.move(oldPath, newPath);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+    }
+
+    private void executeCd(String folder) {
+        Path newPath = Paths.get(workingDir.toString(), folder);
+        newPath = newPath.normalize();
+        if (newPath.isAbsolute() && Files.isDirectory(newPath)) {
+            workingDir = newPath;
+            System.out.println(workingDir);
+        } else {
+            System.out.println("Wrong cd argument");
         }
     }
 
@@ -45,7 +78,7 @@ public class CommandLineEmulator {
                     continue;
                 } else if (Files.isDirectory(tmp)) {
                     size = getDirectorySize(tmp);
-                } else {
+                } else if (!Files.isSymbolicLink(tmp)) {
                     size = Files.size(tmp);
                 }
                 System.out.println(tmp.getFileName().toString() + " " +
@@ -60,7 +93,7 @@ public class CommandLineEmulator {
         long size = 0;
         try (Stream<Path> paths = Files.walk(pth)) {
             for (Path tmp : paths.toArray(Path[]::new)) {
-                if (!Files.isDirectory(tmp)) {
+                if (!Files.isDirectory(tmp) && !Files.isSymbolicLink(tmp)) {
                     size += Files.size(tmp);
                 }
             }
