@@ -10,7 +10,7 @@ public class Program {
         }
         int arrSize = Integer.parseInt(args[0].substring(ProgramUtils.ARRAY_SIZE.length()));
         int numThreads = Integer.parseInt(args[1].substring(ProgramUtils.THREAD_COUNT.length()));
-        if (arrSize < 0 || arrSize < numThreads || arrSize > ProgramUtils.MAX_ARRAY_SIZE) {
+        if (arrSize < numThreads || arrSize > ProgramUtils.MAX_ARRAY_SIZE || numThreads < 0) {
             ProgramUtils.printError("Wrong arguments");
         }
 

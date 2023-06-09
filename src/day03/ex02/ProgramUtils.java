@@ -1,6 +1,5 @@
 package day03.ex02;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class ProgramUtils {
@@ -27,11 +26,18 @@ public class ProgramUtils {
     }
 
     public static void summarizationWithThreads(int[] array, int numThreads) {
-        int sum = 0;
+        SummingThread[] threads = new SummingThread[numThreads];
         for (int i = 0; i < numThreads; i++) {
-            SummingThread obj = new SummingThread(array, i, numThreads);
-            sum += obj.getSum();
+            threads[i] = new SummingThread(array, i, numThreads);
+            threads[i].start();
         }
-        System.out.println("Sum by threads: " + sum);
+        try {
+            for (SummingThread tmp : threads) {
+                tmp.join();
+            }
+        } catch (Exception e) {
+            printError(e.toString());
+        }
+        System.out.println("Sum by threads: " + SummingThread.getSum());
     }
 }
