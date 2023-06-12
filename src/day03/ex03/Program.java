@@ -14,8 +14,7 @@ public class Program {
             printError("threadsCount cannot be less than or equal to 0");
         }
         Downloader downloader = new Downloader(threadsCount);
-        downloader.strartDownload();
-        //System.out.println(downloader.getLinkPool());
+        downloader.startDownload();
     }
 
     public static void printError(String err) {

@@ -1,9 +1,6 @@
 package day03.ex03;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
 import java.net.URL;
 import java.util.Map;
 import java.util.TreeMap;
@@ -17,10 +14,9 @@ public class Downloader {
         this.threadsCount = threadsCount;
         this.linkPool = new TreeMap<>();
         readLinks();
-        //System.out.println(this.linkPool.toString());
     }
 
-    public void strartDownload() {
+    public void startDownload() {
         ThreadsDownloader[] threads = new ThreadsDownloader[threadsCount];
         for (int i = 0; i < threadsCount; i++) {
             threads[i] = new ThreadsDownloader(i + 1);
@@ -50,6 +46,7 @@ public class Downloader {
     public Map<Integer, String> getLinkPool() {return this.linkPool;}
 
     class ThreadsDownloader extends Thread {
+        private static final int BUF_SIZE = 1024;
         private final int index;
 
         ThreadsDownloader(int index) {
@@ -68,17 +65,20 @@ public class Downloader {
                         continue;
                     }
                 }
-                URL fileLink = null;
-                //BufferedWriter fileWriter = null;
-                try {
-                    fileLink = new URL(link);
-                    String[] arrTmp = fileLink.getFile().split("/");
-                    BufferedWriter fileWriter = new BufferedWriter(new FileWriter(arrTmp[arrTmp.length - 1]));
-
+                String[] arrTmp = link.split("/");
+                String outputFile = arrTmp[arrTmp.length - 1];
+                System.out.printf("Thread-%d start download file number %d%n", index, entry.getKey());
+                try (FileOutputStream resultFile = new FileOutputStream(outputFile);
+                     BufferedInputStream linkReader = new BufferedInputStream(new URL(link).openStream())) {
+                    byte[] buf = new byte[BUF_SIZE];
+                    int len;
+                    while ((len = linkReader.read(buf)) != -1) {
+                        resultFile.write(buf, 0, len);
+                    }
                 } catch (Exception e) {
                     Program.printError(e.toString());
                 }
-                System.out.printf("Thread-%d start download file number %d%nFile name: %s%n", index, entry.getKey(), fileLink.getFile());
+                System.out.printf("Thread-%d finish download file number %d%n", index, entry.getKey());
             }
         }
     }
