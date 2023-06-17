@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.Objects;
 
 public class Chatroom {
-    private Integer id;
+    private Long id;
     private String name;
     private User owner;
     private List<Message> messages;
 
-    public Chatroom(Integer id, String name, User owner, List<Message> messages) {
+    public Chatroom(Long id, String name, User owner, List<Message> messages) {
         this.id = id;
         this.name = name;
         this.owner = owner;
@@ -36,7 +36,9 @@ public class Chatroom {
 
     @Override
     public String toString() {
-        return String.format("id: %d%nlogin: %s%nname: %s%nowner: %n%s%nmessages: %s%n",
-                id, name, owner.toString(), messages.toString());
+        String user = (owner == null) ? null : owner.toString();
+        String mess = (messages == null) ? null : messages.toString();
+        return String.format("id=%d,name=\"%s\",creator=%s,messages=%s",
+                id, name, user, mess);
     }
 }

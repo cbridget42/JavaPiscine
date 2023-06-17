@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Objects;
 
 public class User {
-    private Integer id;
+    private Long id;
     private String login;
     private String password;
     private List<Chatroom> createdRooms;
     private List<Chatroom> socializesRooms;
 
-    public User(Integer id, String login, String password, List<Chatroom> createdRooms,
+    public User(Long id, String login, String password, List<Chatroom> createdRooms,
          List<Chatroom> socializesRooms) {
         this.id = id;
         this.login = login;
@@ -40,7 +40,9 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("id: %d%nlogin: %s%npassword: %s%ncreatedRooms: %s%nsocializesRooms: %s%n",
-                id, login, password, createdRooms.toString(), socializesRooms.toString());
+        String cRooms = (createdRooms == null) ? null : createdRooms.toString();
+        String sRooms = (socializesRooms == null) ? null : socializesRooms.toString();
+        return String.format("id=%d,login=\"%s\",password=\"%s\",createdRooms=%s,rooms=%s",
+                id, login, password, cRooms, sRooms);
     }
 }

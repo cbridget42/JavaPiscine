@@ -4,13 +4,13 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Message {
-    private Integer id;
+    private Long id;
     private User author;
     private Chatroom room;
     private String text;
     private LocalDateTime date;
 
-    public Message(Integer id, User author, Chatroom room, String text,
+    public Message(Long id, User author, Chatroom room, String text,
                    LocalDateTime date) {
         this.id = id;
         this.author = author;
@@ -39,7 +39,9 @@ public class Message {
 
     @Override
     public String toString() {
-        return String.format("id: %d%nauthor: %n%s%nroom: %n%s%ntext: %s%ndate: %s%n",
-                id, author.toString(), room.toString(), text, date.toString());
+        String user = (author == null) ? null : author.toString();
+        String sRoom = (room == null) ? null : room.toString();
+        return String.format("Message : {%nid=%d,%nauthor={%s},%nroom={%s},%ntext=\"%s\",%ndateTime=%s%n}",
+                id, user, sRoom, text, date.toString());
     }
 }
