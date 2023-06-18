@@ -6,9 +6,9 @@ import java.sql.*;
 import java.util.Optional;
 
 public class MessagesRepositoryJdbcImpl implements MessagesRepository {
-    private static final String FIND_MESSAGE_TEMPLATE = "SELECT * FROM chat1.messages WHERE id=?";
-    private static final String FIND_USER_TEMPLATE = "SELECT * FROM chat1.users WHERE id=?";
-    private static final String FIND_CHATROOM_TEMPLATE = "SELECT * FROM chat1.users WHERE id=?";
+    private static final String FIND_MESSAGE_TEMPLATE = "SELECT * FROM chat.messages WHERE id=?";
+    private static final String FIND_USER_TEMPLATE = "SELECT * FROM chat.users WHERE id=?";
+    private static final String FIND_CHATROOM_TEMPLATE = "SELECT * FROM chat.users WHERE id=?";
     private DataSource dataSource;
 
     public MessagesRepositoryJdbcImpl(DataSource dataSource) {
