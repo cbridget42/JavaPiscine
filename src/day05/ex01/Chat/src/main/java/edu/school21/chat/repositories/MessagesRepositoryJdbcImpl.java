@@ -19,8 +19,8 @@ public class MessagesRepositoryJdbcImpl implements MessagesRepository {
     public Optional<Message> findById(Long id) {
         Optional<Message> result = Optional.empty();;
 
-        try (Connection dbConnection = dataSource.getConnection()) {
-            PreparedStatement pStatement = dbConnection.prepareStatement(FIND_MESSAGE_TEMPLATE);
+        try (Connection dbConnection = dataSource.getConnection();
+            PreparedStatement pStatement = dbConnection.prepareStatement(FIND_MESSAGE_TEMPLATE)) {
             pStatement.setLong(1, id);
             ResultSet resSet = pStatement.executeQuery();
             if (!resSet.next()) {
