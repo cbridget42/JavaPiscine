@@ -4,6 +4,7 @@ import edu.school21.chat.models.*;
 import edu.school21.chat.exceptions.*;
 import javax.sql.DataSource;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class MessagesRepositoryJdbcImpl implements MessagesRepository {
@@ -33,7 +34,7 @@ public class MessagesRepositoryJdbcImpl implements MessagesRepository {
             statement.setLong(5, message.getId());
             statement.execute();
         } catch (Exception e) {
-            printError(e.getMessage());
+            throw new NotSavedSubEntityException("message has not been updated");
         }
     }
 
@@ -72,8 +73,10 @@ public class MessagesRepositoryJdbcImpl implements MessagesRepository {
             }
             User user = findUser(resSet.getLong(2), dbConnection);
             Chatroom room = findChatroom(resSet.getLong(3), dbConnection);
+            LocalDateTime dateTime = (resSet.getTimestamp(5) == null) ? null :
+                    resSet.getTimestamp(5).toLocalDateTime();
             result = Optional.of(new Message(id, user, room, resSet.getString(4),
-                    resSet.getTimestamp(5).toLocalDateTime()));
+                    dateTime));
         } catch (Exception e) {
             printError(e.getMessage());
         }
