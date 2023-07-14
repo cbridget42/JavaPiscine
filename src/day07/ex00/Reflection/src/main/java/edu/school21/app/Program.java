@@ -9,7 +9,10 @@ public class Program {
             DemoReflection demoReflection = new DemoReflection();
             System.out.printf("%s%nLet’s create an object.%n", SEP);
             demoReflection.createObject();
-
+            System.out.println(SEP);
+            demoReflection.changeField();
+            System.out.println(SEP);
+            demoReflection.callMethod();
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
