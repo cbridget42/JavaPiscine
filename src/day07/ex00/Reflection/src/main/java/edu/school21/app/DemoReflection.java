@@ -1,32 +1,43 @@
 package edu.school21.app;
 
-import edu.school21.classes.Car;
-import edu.school21.classes.User;
-
+import java.io.Closeable;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class DemoReflection {
+public class DemoReflection implements Closeable {
+    private static final String PACKAGE_NAME = "edu.school21.classes";
     private final Scanner sc = new Scanner(System.in);
     private final Field[] fields;
     private final Method[] methods;
     private final Class<?> item;
     private Object obj = null;
 
-    public DemoReflection() {
-        String name = sc.nextLine();
-        switch (name) {
-            case "User":
-                this.item = User.class;
-                break;
-            case "Car":
-                this.item = Car.class;
-                break;
-            default:
-                throw new RuntimeException("No such class!");
+    public DemoReflection() throws Exception {
+        Set<Class<?>> myClasses = findClasses();
+        System.out.println("Classes:");
+        for (Class<?> cl : myClasses) {
+            System.out.printf(" - %s%n", cl.getSimpleName());
         }
+        System.out.printf("%s%nEnter class name:%n", Program.SEP);
+        String name = sc.nextLine();
+        List<Class<?>> lst = myClasses.stream().filter(it -> it.getSimpleName().equals(name))
+                .collect(Collectors.toList());
+        if (lst.isEmpty()) {
+            throw new RuntimeException("No such class!");
+        }
+        this.item = lst.get(0);
         this.fields = this.item.getDeclaredFields();
         this.methods = this.item.getDeclaredMethods();
         printFieldsAndMethods();
@@ -164,5 +175,32 @@ public class DemoReflection {
             methodSignature.insert(0, String.format("   %s ", method.getReturnType().getSimpleName()));
         }
         return methodSignature.toString();
+    }
+
+    private Set<Class<?>> findClasses() throws Exception {
+        Set<Class<?>> res = new HashSet<>();
+
+        URI uri = DemoReflection.class.getClassLoader()
+                .getResource(PACKAGE_NAME.replace('.', '/'))
+                .toURI();
+        try (Stream<Path> stream = Files.walk(Paths.get(uri), 1)) {
+            stream.forEach(element -> {
+                String str = element.toString();
+                if (str.endsWith(".class")) {
+                    str = str.substring(str.lastIndexOf('/') + 1, str.lastIndexOf('.'));
+                    try {
+                        res.add(Class.forName(PACKAGE_NAME + "." + str));
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        }
+        return res;
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.sc.close();
     }
 }
