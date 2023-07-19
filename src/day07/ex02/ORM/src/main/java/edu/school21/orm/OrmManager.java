@@ -12,6 +12,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -150,6 +152,77 @@ public class OrmManager {
         } catch (Exception e) {
             printError(e.getMessage());
         }
+    }
+
+    public void update(Object entity) {
+        Class<?> clazz = entity.getClass();
+        if (!clazz.isAnnotationPresent(OrmEntity.class)) {
+            return;
+        }
+        StringBuilder query = new StringBuilder(String
+                .format("UPDATE %s SET ", clazz.getAnnotation(OrmEntity.class).table()));
+        try {
+            long id = 0;
+            for (Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                if (field.isAnnotationPresent(OrmColumn.class)) {
+                    String val;
+                    if (field.getType().getSimpleName().equals("String")) {
+                        val = String.format("'%s'", field.get(entity));
+                    } else {
+                        val = field.get(entity).toString();
+                    }
+                    query.insert(query.length(), String.format("%s=%s, ",
+                            field.getAnnotation(OrmColumn.class).name(), val));
+                } else if (field.isAnnotationPresent(OrmColumnId.class)) {
+                    id = (long) field.get(entity);
+                }
+            }
+            query.delete(query.length() - 2, query.length());
+            query.insert(query.length(), String
+                    .format(" WHERE id=%d;", id));
+        } catch (Exception e) {
+            printError(e.getMessage());
+        }
+        System.out.println(query);
+        executeQuery(query.toString());
+    }
+
+    public <T> T findById(Long id, Class<T> aClass) {
+        if (!aClass.isAnnotationPresent(OrmEntity.class)) {
+            System.err.println("There is no OrmEntity annotation in the class!");
+            return null;
+        }
+        String query = String
+                .format("SELECT * FROM %s WHERE id=%d;",
+                        aClass.getAnnotation(OrmEntity.class).table(), id);
+        System.out.println(query);
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+             ResultSet resultSet = statement.executeQuery(query);
+            if (resultSet.next()) {
+                List<Class<?>> typeParams = new ArrayList<>();
+                List<Object> objParams = new ArrayList<>();
+                for (Field field : aClass.getDeclaredFields()) {
+                    if (field.isAnnotationPresent(OrmColumn.class)) {
+                        typeParams.add(field.getType());
+                        objParams.add(resultSet.getObject(field
+                                .getAnnotation(OrmColumn.class).name()));
+                    } else if (field.isAnnotationPresent(OrmColumnId.class)) {
+                        typeParams.add(Long.class);
+                        objParams.add(id);
+                    }
+                }
+                return aClass.getConstructor(typeParams.toArray(new Class<?>[0]))
+                        .newInstance(objParams.toArray(new Object[0]));
+            } else {
+                System.err.println("There is no record in the table!");
+                return null;
+            }
+        } catch (Exception e) {
+            printError(e.getMessage());
+        }
+        return null;
     }
 
     private Field findIdField(Object entity) {

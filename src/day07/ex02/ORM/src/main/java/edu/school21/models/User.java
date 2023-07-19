@@ -22,6 +22,13 @@ public class User {
         this.age = age;
     }
 
+    public User() {
+        this.id = 0L;
+        this.firstName = "def";
+        this.lastName = "def";
+        this.age = 0;
+    }
+
     public Long getId() {
         return id;
     }
@@ -52,5 +59,15 @@ public class User {
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", age=" + age +
+                '}';
     }
 }

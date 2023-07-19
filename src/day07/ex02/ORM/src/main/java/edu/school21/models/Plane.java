@@ -53,4 +53,14 @@ public class Plane {
     public void setSpeed(Double speed) {
         this.speed = speed;
     }
+
+    @Override
+    public String toString() {
+        return "Plane{" +
+                "id=" + id +
+                ", model='" + model + '\'' +
+                ", country='" + country + '\'' +
+                ", speed=" + speed +
+                '}';
+    }
 }
