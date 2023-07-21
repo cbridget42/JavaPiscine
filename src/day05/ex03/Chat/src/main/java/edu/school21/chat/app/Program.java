@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import edu.school21.chat.models.Message;
-
 public class Program {
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/postgres";
     private static final String DB_USERNAME = "cbridget";
