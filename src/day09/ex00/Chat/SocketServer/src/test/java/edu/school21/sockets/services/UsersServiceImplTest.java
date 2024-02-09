@@ -2,6 +2,7 @@ package edu.school21.sockets.services;
 
 import edu.school21.sockets.models.User;
 import edu.school21.sockets.repositories.UsersRepositoryImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -23,7 +24,7 @@ class UsersServiceImplTest {
         User user = new User("42", "21");
         Mockito.when(mockUsersRepository.findByUserName(Mockito.any()))
                 .thenReturn(Optional.of(user));
-        usersService.signUp(user);
+        Assertions.assertThrows(RuntimeException.class, () -> usersService.signUp(user));
         Mockito.verify(mockUsersRepository, Mockito.times(1)).findByUserName(Mockito.any());
     }
 }
