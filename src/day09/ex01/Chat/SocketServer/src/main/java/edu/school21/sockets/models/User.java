@@ -10,11 +10,11 @@ import lombok.Setter;
 public class User {
     Long id;
     String name;
-    String pass;
+    String password;
 
     public User(String name, String pass) {
         this.name = name;
-        this.pass = pass;
+        this.password = pass;
     }
 
     public User() {}

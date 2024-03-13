@@ -20,7 +20,7 @@ class UsersServiceImplTest {
 
     @Test
     void signUpTest() {
-        this.usersService = new UsersServiceImpl(mockUsersRepository, null);
+        this.usersService = new UsersServiceImpl(mockUsersRepository, null, null);
         User user = new User("42", "21");
         Mockito.when(mockUsersRepository.findByUserName(Mockito.any()))
                 .thenReturn(Optional.of(user));

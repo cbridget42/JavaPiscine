@@ -13,7 +13,7 @@ public class Main {
         Client client = new Client(Integer.parseInt(args[0].substring(13)));
         try {
             client.start();
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.println(e);
         }
     }

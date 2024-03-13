@@ -43,7 +43,7 @@ public class UsersRepositoryImpl implements UsersRepository {
     @Override
     public void update(User entity) {
         String update = "UPDATE server.user SET name = ?, password = ? WHERE id = ?;";
-        int res = jdbcTemplate.update(update, entity.getName(), entity.getPass(), entity.getId());
+        int res = jdbcTemplate.update(update, entity.getName(), entity.getPassword(), entity.getId());
 
         if (res == 0) {
             System.err.println("Entity hasn't been updated!");
@@ -53,7 +53,7 @@ public class UsersRepositoryImpl implements UsersRepository {
     @Override
     public void save(User entity) {
         String update = "INSERT INTO server.user (name, password) VALUES (?, ?);";
-        int res = jdbcTemplate.update(update, entity.getName(), entity.getPass());
+        int res = jdbcTemplate.update(update, entity.getName(), entity.getPassword());
 
         if (res == 0) {
             System.err.println("Entity not created!");

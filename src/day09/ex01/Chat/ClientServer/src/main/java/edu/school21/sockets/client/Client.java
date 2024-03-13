@@ -15,27 +15,25 @@ public class Client {
         this.port = port;
     }
 
-    public void start() throws IOException {
+    public void start() throws IOException, InterruptedException {
         try (Socket socket = new Socket("127.0.0.1", port)) {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             Scanner scanner = new Scanner(System.in);
 
-            while (true) {
-                String str = reader.readLine();
-                System.out.println(str);
-                if (str.equals("Successful!") || str.equals("Internal server error!")) {
-                    break;
-                } else {
-                    writer.write(scanner.nextLine() + "\n");
-                    writer.flush();
-                }
+            ClientReader clientReader = new ClientReader(reader);
+            clientReader.start();
+            ClientWriter clientWriter = new ClientWriter(writer, scanner);
+            clientWriter.start();
+            clientReader.join();
+            clientWriter.interrupt();
 
-            }
             reader.close();
             writer.close();
             scanner.close();
+        } catch (InterruptedException e) {
+            throw e;
         }
     }
 }
