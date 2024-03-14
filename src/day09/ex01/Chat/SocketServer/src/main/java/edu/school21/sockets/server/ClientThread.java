@@ -91,7 +91,6 @@ public class ClientThread extends Thread {
             String message = bufferedReader.readLine().trim();
             if ("Exit".equals(message)) {
                 stopClient("You have left the chat.\n");
-                break;
             } else {
                 usersService.saveMessage(new Message(message, LocalDateTime.now()));
                 broadcastMessage(message);
@@ -102,7 +101,7 @@ public class ClientThread extends Thread {
     private void broadcastMessage(String message) throws IOException {
         for (ClientThread client : Server.getClients()) {
             if (ObjectUtils.notEqual(client.getClientSocket(), clientSocket)) {
-                client.sendMessage(message);
+                client.sendMessage(message + '\n');
             }
         }
     }
