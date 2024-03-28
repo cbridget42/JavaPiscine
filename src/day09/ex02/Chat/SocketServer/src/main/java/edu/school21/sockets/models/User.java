@@ -9,10 +9,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class User {
     private Long id;
+    private Long lastRoomId;
     private String name;
     private String password;
 
     public User(String name, String pass) {
+        this.lastRoomId = -1L;
         this.name = name;
         this.password = pass;
     }

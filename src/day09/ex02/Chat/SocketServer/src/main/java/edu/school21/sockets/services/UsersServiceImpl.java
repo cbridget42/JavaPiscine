@@ -60,4 +60,19 @@ public class UsersServiceImpl implements UsersService {
     public List<Room> findAllRooms() {
         return roomRepository.findAll();
     }
+
+    @Override
+    public Optional<Room> findRoom(String name) {
+        return roomRepository.findByRoomName(name);
+    }
+
+    @Override
+    public Optional<User> findUserByName(String name) {
+        return usersRepository.findByUserName(name);
+    }
+
+    @Override
+    public List<Message> findMessagesByRoomId(Long roomId) {
+        return messageRepository.findByRoomId(roomId);
+    }
 }

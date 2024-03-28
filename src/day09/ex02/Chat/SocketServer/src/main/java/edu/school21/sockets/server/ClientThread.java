@@ -16,17 +16,24 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ClientThread extends Thread {
 
+    private static final String EXIT = "Exit";
+    private static final String WRONG_COMMAND = "wrong command! try again!\n";
+    private static final String LEFT_CHAT = "You have left the chat.\n";
     @Getter
     private final Socket clientSocket;
     private final UsersService usersService;
     private BufferedWriter bufferedWriter;
     private BufferedReader bufferedReader;
     private Boolean runClient;
+    @Getter
     private String clientName;
+    @Getter
+    private Long roomId;
 
     public ClientThread(Socket clientSocket, UsersService usersService) {
         this.clientSocket = clientSocket;
@@ -42,20 +49,18 @@ public class ClientThread extends Thread {
             sendMessage("Hello from Server!\n");
             runClient = true;
             while (runClient) {
-                switch (selectCommand(Arrays.asList("signIn", "signUp", "Exit"))) {
+                switch (selectCommand(Arrays.asList("signIn", "signUp", EXIT))) {
                     case 1:
                         signIn();
-//                        roomLoop();
                         break;
                     case 2:
                         signUp();
-//                        roomLoop();
                         break;
                     case 3:
-                        stopClient("You have left the chat.\n");
+                        stopClient(LEFT_CHAT);
                         break;
                     default:
-                        sendMessage("wrong command! try again!\n");
+                        sendMessage(WRONG_COMMAND);
                         break;
                 }
             }
@@ -66,18 +71,18 @@ public class ClientThread extends Thread {
 
     private void roomLoop() throws IOException {
         while (runClient) {
-            switch (selectCommand(Arrays.asList("Create room", "Choose room", "Exit"))) {
+            switch (selectCommand(Arrays.asList("Create room", "Choose room", EXIT))) {
                 case 1:
                     createRoom();
                     break;
                 case 2:
-//                    chooseRoom();
+                    chooseRoom();
                     break;
                 case 3:
-                    stopClient("You have left the chat.\n");
+                    stopClient(LEFT_CHAT);
                     break;
                 default:
-                    sendMessage("wrong command! try again!\n");
+                    sendMessage(WRONG_COMMAND);
                     break;
             }
         }
@@ -88,6 +93,9 @@ public class ClientThread extends Thread {
         try {
             usersService.createRoom(new Room(name, clientName));
             sendMessage("Successful!\n");
+            this.roomId = usersService.findRoom(name)
+                    .orElseThrow(() -> new RuntimeException("Failed to create room."))
+                    .getId();
             messaging();
         } catch (RuntimeException e) {
             System.err.println(e.getMessage());
@@ -97,11 +105,20 @@ public class ClientThread extends Thread {
 
     private void chooseRoom() throws IOException {
         List<Room> rooms = usersService.findAllRooms();
+        List<String> commands = rooms.stream()
+                .map(Room::getName)
+                .collect(Collectors.toList());
+        commands.add(EXIT);
         while (runClient) {
-            int val = selectCommand(rooms.stream()
-                    .map(Room::getName)
-                    .collect(Collectors.toList()));
-            //TODO
+            int val = selectCommand(commands) - 1;
+            if (val == commands.size() - 1) {
+                stopClient(LEFT_CHAT);
+            } else if (0 <= val && val < rooms.size()) {
+                this.roomId = rooms.get(val).getId();
+                messaging();
+            } else {
+                sendMessage(WRONG_COMMAND);
+            }
         }
     }
 
@@ -122,6 +139,7 @@ public class ClientThread extends Thread {
         try {
             usersService.signUp(new User(this.clientName, pass));
             sendMessage("Successful!\n");
+            printLastMessages();
             roomLoop();
         } catch (RuntimeException e) {
             System.err.println(e.getMessage());
@@ -136,22 +154,22 @@ public class ClientThread extends Thread {
         try {
             usersService.signIn(new User(this.clientName, pass));
             sendMessage("Successful!\n");
+            printLastMessages();
             roomLoop();
-//            messaging();
         } catch (RuntimeException e) {
             System.err.println(e.getMessage());
             sendMessage("Incorrect name and password!\n");
         }
     }
 
-    private void messaging() throws IOException {//TODO fix this for new requirements
+    private void messaging() throws IOException {
         sendMessage("Start messaging\n");
         while (runClient) {
             String message = bufferedReader.readLine().trim();
-            if ("Exit".equals(message)) {
-                stopClient("You have left the chat.\n");
+            if (EXIT.equals(message)) {
+                stopClient(LEFT_CHAT);
             } else {
-                usersService.saveMessage(new Message(message, LocalDateTime.now()));
+                usersService.saveMessage(new Message(message, LocalDateTime.now(), this.roomId));
                 broadcastMessage(message);
             }
         }
@@ -159,7 +177,8 @@ public class ClientThread extends Thread {
 
     private void broadcastMessage(String message) throws IOException {
         for (ClientThread client : Server.getClients()) {
-            if (ObjectUtils.notEqual(client.getClientSocket(), clientSocket)) {
+            if (ObjectUtils.notEqual(client.getClientName(), this.clientName)
+                    && Objects.equals(client.getRoomId(), this.roomId)) {
                 client.sendMessage(message + '\n');
             }
         }
@@ -183,5 +202,24 @@ public class ClientThread extends Thread {
     private void sendMessage(String message) throws IOException {
         bufferedWriter.write(message);
         bufferedWriter.flush();
+    }
+
+    private void printLastMessages() {
+        usersService.findUserByName(this.clientName)
+                .filter(user -> ObjectUtils.notEqual(user.getLastRoomId(), -1L))
+                .ifPresent(user -> {
+                    try {
+                        sendMessage("Last messages:\n");
+                        List<String> messages = usersService.findMessagesByRoomId(user.getLastRoomId())
+                                .stream()
+                                .map(Message::getText)
+                                .collect(Collectors.toList());
+                        for (int i = (messages.size() > 29) ? messages.size() - 30 : 0; i < messages.size(); i++) {
+                            sendMessage(messages.get(i) + '\n');
+                        }
+                    } catch (IOException e) {
+                        System.err.println("ignored exception:\n" + e);
+                    }
+                });
     }
 }

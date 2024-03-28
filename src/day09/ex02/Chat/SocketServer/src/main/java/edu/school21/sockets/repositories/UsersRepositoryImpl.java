@@ -21,6 +21,7 @@ public class UsersRepositoryImpl implements UsersRepository {
         jdbcTemplate.execute("CREATE SCHEMA IF NOT EXISTS server");
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS server.user (\n" +
                 "id SERIAL PRIMARY KEY,\n" +
+                "last_room_id INTEGER NOT NULL,\n" +
                 "name VARCHAR(50) NOT NULL UNIQUE,\n" +
                 "password VARCHAR(256) NOT NULL);");
     }
@@ -42,8 +43,8 @@ public class UsersRepositoryImpl implements UsersRepository {
 
     @Override
     public void update(User entity) {
-        String update = "UPDATE server.user SET name = ?, password = ? WHERE id = ?;";
-        int res = jdbcTemplate.update(update, entity.getName(), entity.getPassword(), entity.getId());
+        String update = "UPDATE server.user SET last_room_id = ?, name = ?, password = ? WHERE id = ?;";
+        int res = jdbcTemplate.update(update, entity.getLastRoomId(), entity.getName(), entity.getPassword(), entity.getId());
 
         if (res == 0) {
             System.err.println("Entity hasn't been updated!");
@@ -52,8 +53,8 @@ public class UsersRepositoryImpl implements UsersRepository {
 
     @Override
     public void save(User entity) {
-        String update = "INSERT INTO server.user (name, password) VALUES (?, ?);";
-        int res = jdbcTemplate.update(update, entity.getName(), entity.getPassword());
+        String update = "INSERT INTO server.user (last_room_id, name, password) VALUES (?, ?, ?);";
+        int res = jdbcTemplate.update(update, entity.getLastRoomId(), entity.getName(), entity.getPassword());
 
         if (res == 0) {
             System.err.println("Entity not created!");

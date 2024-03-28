@@ -21,6 +21,7 @@ public class MessageRepositoryImpl implements MessageRepository {
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS server.message (\n" +
                 "id SERIAL PRIMARY KEY,\n" +
                 "text VARCHAR(1000) NOT NULL,\n" +
+                "room_id INTEGER NOT NULL,\n" +
                 "time timestamp default current_timestamp);");
     }
 
@@ -34,6 +35,12 @@ public class MessageRepositoryImpl implements MessageRepository {
     }
 
     @Override
+    public List<Message> findByRoomId(Long roomId) {
+        String query = "SELECT * FROM server.message WHERE id = ?;";
+        return jdbcTemplate.query(query, new Object[]{roomId}, new int[]{Types.INTEGER}, new BeanPropertyRowMapper<>(Message.class));
+    }
+
+    @Override
     public List<Message> findAll() {
         String query = "SELECT * FROM server.message;";
         return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(Message.class));
@@ -41,8 +48,8 @@ public class MessageRepositoryImpl implements MessageRepository {
 
     @Override
     public void update(Message entity) {
-        String update = "UPDATE server.message SET text = ?, time = ? WHERE id = ?;";
-        int res = jdbcTemplate.update(update, entity.getText(), entity.getTime(), entity.getId());
+        String update = "UPDATE server.message SET text = ?, time = ?, room_id = ? WHERE id = ?;";
+        int res = jdbcTemplate.update(update, entity.getText(), entity.getTime(), entity.getRoomId(), entity.getId());
 
         if (res == 0) {
             System.err.println("Entity hasn't been updated!");
@@ -51,8 +58,8 @@ public class MessageRepositoryImpl implements MessageRepository {
 
     @Override
     public void save(Message entity) {
-        String update = "INSERT INTO server.message (text, time) VALUES (?, ?);";
-        int res = jdbcTemplate.update(update, entity.getText(), entity.getTime());
+        String update = "INSERT INTO server.message (text, time, room_id) VALUES (?, ?, ?);";
+        int res = jdbcTemplate.update(update, entity.getText(), entity.getTime(), entity.getRoomId());
 
         if (res == 0) {
             System.err.println("Entity not created!");
